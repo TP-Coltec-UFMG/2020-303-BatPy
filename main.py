@@ -5,6 +5,7 @@ from sprites import Spritesheet
 
 # inicializando a biblioteca
 pygame.init()
+# pygame.mixer.init()
 
 # inicializando a tela
 screen = pygame.display.set_mode((900, 600), 0)
@@ -12,6 +13,7 @@ screen = pygame.display.set_mode((900, 600), 0)
 # cores para o desenho
 AMARELO = (255, 255, 0)
 PRETO = (0, 0, 0)
+BRANCO = (255, 255, 255)
 VERDE = (0, 100, 0)
 MARROMT = (150, 75, 0, 99)
 AZULE = (0, 0, 139)
@@ -24,11 +26,16 @@ class Cenario:
         self.sprites = sprites
         self.bat = bat
         self.tamanho = tamanho
-        # 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+        # , 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+        # , 2, 2, 2, 2, 2
+        # , 3, 3, 3, 3, 3
         self.matriz = [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-            [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+             1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+             2, 2, 2, 2, 2, 2, 2, 2, 2],
+            [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+             3, 3, 3, 3, 3, 3, 3, 3, 3],
         ]
 
     def calcular_regras(self, col_int, lin_int):
@@ -53,8 +60,13 @@ class Cenario:
                 pygame.draw.rect(tela, cor, (x, y, self.tamanho / 10, self.tamanho), 0)
 
     def pintar(self, tela):
+        myfont = pygame.font.SysFont("Comic Sans MS", 50)
+        # apply it to text on a label
+        label = myfont.render(str(bat.pontos), True, BRANCO)
+        # put the label object on the screen at point x=100, y=100
         for l, linha in enumerate(self.matriz):
             self.pintar_linha(tela, l, linha)
+        screen.blit(label, (450, 25))
 
 
 class Morcego:
@@ -71,6 +83,7 @@ class Morcego:
         self.tamanho = tamanho
         self.raio = int(self.tamanho / 2)
         self.mode = 1
+        self.pontos = 0
         # velocidade
         self.vel_x = 0
         self.vel_y = 0
@@ -82,6 +95,12 @@ class Morcego:
         self.centro_y = int(self.linha * self.tamanho + self.raio)
 
     def aceitar_movimento(self):
+        descer = pygame.mixer.Sound("descendo.wav")
+        subir = pygame.mixer.Sound("subindo.wav")
+        if self.linha_intencao > self.linha:
+            pygame.mixer.Sound.play(descer)
+        elif self.linha_intencao < self.linha:
+            pygame.mixer.Sound.play(subir)
         self.coluna = self.coluna_intencao
         self.linha = self.linha_intencao
 
@@ -99,8 +118,8 @@ class Morcego:
         # Tentativas de mexer com o sprite
         # batpy1 = pygame.transform.smoothscale(self.sprites.parse_sprite(self.mode, 0), (250, 250))
         # batpy1 = pygame.transform.rotozoom(self.sprites.parse_sprite(self.mode, 0), 0, 15)
-        # batpy1 =pygame.transform.scale2x(pygame.transform.scale2x(pygame.transform.scale2x(pygame.transform.scale2x(
-        # self.sprites.parse_sprite(self.mode, 0)))))
+        #batpy1 =pygame.transform.scale2x(pygame.transform.scale2x(pygame.transform.scale2x(pygame.transform.scale2x(
+        #self.sprites.parse_sprite(self.mode, 0)))))
         batpy1 = pygame.transform.scale(self.sprites.parse_sprite(self.mode, 0), (250, 250))
         pygame.display.flip()
         tela.blit(batpy1, (self.centro_x - self.raio * 1.3, self.centro_y - self.raio))
@@ -117,6 +136,10 @@ class Morcego:
                     self.vel_y = -1
                 if e.key == pygame.K_DOWN:
                     self.vel_y = 1
+                if e.key == pygame.K_w:
+                    self.vel_y = -1
+                if e.key == pygame.K_s:
+                    self.vel_y = 1
                 if e.key == pygame.K_ESCAPE:
                     e.type = pygame.QUIT
 
@@ -124,6 +147,10 @@ class Morcego:
                 if e.key == pygame.K_UP:
                     self.vel_y = 0
                 if e.key == pygame.K_DOWN:
+                    self.vel_y = 0
+                if e.key == pygame.K_w:
+                    self.vel_y = 0
+                if e.key == pygame.K_s:
                     self.vel_y = 0
 
 
@@ -140,21 +167,27 @@ class Inimigos:
         self.ponto_y = 0
         self.calcular_regras()
         # velocidade
-        self.vel_x = 25
+        self.vel_x = 30
         self.vel_y = 0
 
     def calcular_regras(self):
+        # 600 = 400
+        # 900 = 1000 ~ 800/700 tb serve
         if self.tipo == 0:
+            bat.pontos = bat.pontos + 1
+            self.vel_x = self.vel_x + 2
+            if self.vel_x > 60:
+                self.vel_x = self.vel_x - 1
             self.tipo = random.randint(1, 3)
         if self.tipo == 3:
             self.ponto_y = 400
-            self.ponto_x = 400
+            self.ponto_x = 1000
         if self.tipo == 2:
             self.ponto_y = 200
-            self.ponto_x = 400
+            self.ponto_x = 1000
         if self.tipo == 1:
             self.ponto_y = 0
-            self.ponto_x = 400
+            self.ponto_x = 1000
 
     def pintar(self, tela):
         if self.tipo == 3:
@@ -176,42 +209,85 @@ class Inimigos:
             # pygame.display.flip()
             tela.blit(pararaio, (self.ponto_x - 32, self.ponto_y - 32))
 
-    def processar_eventos(self):
+    def processar_eventos(self, e):
         # 163 cabeça , 190 asa, -200 tras asa, -173?
+        crash_sound = pygame.mixer.Sound("dirsom.wav")
+        surge_sound = pygame.mixer.Sound("esqsom.wav")
+        # self.processar_som(e)
         if self.ponto_x > -250 and self.tipo != 0:
             self.ponto_x = self.ponto_x - self.vel_x
-            if -150 < self.ponto_x < 163:
-                if bat.linha == self.tipo-1:
-                    pygame.draw.circle(screen, CINZA, (self.ponto_x + self.tamanho / 8, self.ponto_y + self.tamanho / 2), self.raio*4)
-                    exit()
+            if self.ponto_x > -150:
+                if bat.linha == self.tipo - 1:
+                    self.processar_som(e)
+                    # pygame.mixer.Sound.play(crash_sound)
+                    if self.ponto_x < 163:
+                        pygame.mixer.Sound.play(surge_sound)
+                        exit()
         else:
             self.tipo = 0
+            pygame.mixer.Sound.play(surge_sound)
+            # pygame.mixer.Sound.play(crash_sound)
             self.calcular_regras()
+
+    def processar_som(self, eventos):
+        # pygame.mixer.music.load("dirsom.wav")
+        crash_sound = pygame.mixer.Sound("dirsom.wav")
+        surge_sound = pygame.mixer.Sound("esqsom.wav")
+        for e in eventos:
+            if e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_SPACE:
+                    # pygame.mixer.Sound.play(surge_sound)
+                    pygame.mixer.Sound.play(crash_sound)
+                    '''if bat.linha == self.tipo - 1:
+                        #pygame.time.delay(1000)
+                        #pygame.mixer.Sound.play(surge_sound)
+                        pygame.mixer.Sound.play(crash_sound)'''
 
 
 if __name__ == "__main__":
     size = 600 // 3
+    escuro = 0
+    pause = 0
     spritesheet = Spritesheet('spritesheet.png')
     bat = Morcego(size, spritesheet)
     obstaculo = Inimigos(size, bat, spritesheet)
     cenario = Cenario(size, bat, spritesheet)
+    # crash_sound = pygame.mixer.Sound("dirsom.wav")
+    surge_sound = pygame.mixer.Sound("esqsom.wav")
+    subir = pygame.mixer.Sound("subindo.wav")
+    descer = pygame.mixer.Sound("descendo.wav")
+    pygame.mixer.Sound.play(surge_sound)
     while True:
         # Calcular as Regras
         # obstaculo.calcular_regras()
-        bat.calcular_regras()
-        obstaculo.processar_eventos()
-        cenario.calcular_regras(bat.coluna_intencao, bat.linha_intencao)
+        if pause == 0:
+            bat.calcular_regras()
+            cenario.calcular_regras(bat.coluna_intencao, bat.linha_intencao)
         # Pintar a tela
         screen.fill(PRETO)
-        cenario.pintar(screen)
-        obstaculo.pintar(screen)
-        bat.pintar(screen)
+        if escuro == 0:
+            cenario.pintar(screen)
+            obstaculo.pintar(screen)
+            bat.pintar(screen)
         pygame.display.update()
         pygame.time.delay(100)
 
         # Captura de eventos
         eventos = pygame.event.get()
         for e in eventos:
+            if e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_p:
+                    if pause == 0:
+                        pause = 1
+                    else:
+                        pause = 0
+                if e.key == pygame.K_e:
+                    if escuro == 0:
+                        escuro = 1
+                    else:
+                        escuro = 0
             if e.type == pygame.QUIT:
                 exit()
-        bat.processar_eventos(eventos)
+        if pause == 0:
+            bat.processar_eventos(eventos)
+            obstaculo.processar_eventos(eventos)
