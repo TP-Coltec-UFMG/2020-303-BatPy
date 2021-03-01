@@ -72,7 +72,7 @@ class Cenario:
 class Morcego:
     # construtor
     def __init__(self, tamanho, sprites):
-        # posição que será desenhado
+        # posicao que sera desenhado
         self.sprites = sprites
         self.coluna = 0
         self.linha = 1
@@ -106,7 +106,7 @@ class Morcego:
 
     def pintar(self, tela):
         # corpo
-        # Pré morcego
+        # Pre morcego
         """
         pygame.draw.circle(tela, CINZA, (self.centro_x, self.centro_y), self.raio / 1, 0)
         pe = (self.centro_x, self.centro_y + self.raio)
@@ -157,7 +157,7 @@ class Morcego:
 class Inimigos:
     # construtor
     def __init__(self, tamanho, bat, sprites):
-        # posição que será desenhado
+        # posicao que sera desenhado
         self.sprites = sprites
         self.bat = bat
         self.tipo = random.randint(1, 3)
@@ -210,7 +210,7 @@ class Inimigos:
             tela.blit(pararaio, (self.ponto_x - 32, self.ponto_y - 32))
 
     def processar_eventos(self, e):
-        # 163 cabeça , 190 asa, -200 tras asa, -173?
+        # 163 cabeca , 190 asa, -200 tras asa, -173?
         crash_sound = pygame.mixer.Sound("dirsom.wav")
         surge_sound = pygame.mixer.Sound("esqsom.wav")
         # self.processar_som(e)
