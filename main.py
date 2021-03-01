@@ -222,6 +222,7 @@ class Inimigos:
                     # pygame.mixer.Sound.play(crash_sound)
                     if self.ponto_x < 163:
                         pygame.mixer.Sound.play(surge_sound)
+                        pygame.time.delay(1500)
                         exit()
         else:
             self.tipo = 0
