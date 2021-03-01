@@ -16,8 +16,8 @@ $ git clone https://github.com/TP-Coltec-UFMG/BatPy
 # Acesse o diretorio
 $ cd BatPy
 
-# Instale as dependencias
-$ pip install -r requirements.txt
+# Instale o pygame
+$ pip install pygame
 
 # Execute o main
 $ python main.py
